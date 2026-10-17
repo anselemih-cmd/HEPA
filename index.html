@@ -1,0 +1,723 @@
+
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#73d5f2">
+<title>HEPA - High Education Private Assistance</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+:root{--blue:#73d5f2;--blue2:#39b6dc;--dark:#153c48;--bg:#f3fbfd;--border:#deedf1}
+body{background:var(--bg);color:var(--dark);min-height:100vh}
+button,input{font:inherit}
+button{cursor:pointer;border:0}
+header{height:72px;background:white;display:flex;align-items:center;justify-content:space-between;padding:0 17px;position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{height:44px;width:44px;border-radius:14px;background:linear-gradient(135deg,#9be8fb,#42bce0);display:grid;place-items:center;color:white;font-size:22px;font-weight:900}
+.brand-name{color:#38b4d8;font-size:22px;font-weight:900;letter-spacing:1px}
+.brand-long{font-size:8px;letter-spacing:.4px;color:#607b83;margin-top:4px;font-weight:bold}
+.menu-btn{background:#eafaff;color:#36afd2;border-radius:12px;width:43px;height:43px;font-size:25px}
+.overlay{display:none;position:fixed;inset:0;background:#12313c66;z-index:20}
+.overlay.show{display:block}
+.sidebar{position:fixed;right:-290px;top:0;height:100%;width:275px;background:white;z-index:30;padding:20px;transition:.25s;box-shadow:-10px 0 35px #12313c20}
+.sidebar.open{right:0}
+.close{display:block;margin-left:auto;background:#eafaff;color:#219fc6;width:40px;height:40px;border-radius:12px;font-size:24px}
+.menu-title{padding:24px 5px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.menu-title strong{font-size:23px;color:#38b4d8}
+.menu-title small{display:block;font-size:9px;margin-top:5px}
+.nav{display:block;width:100%;text-align:left;background:white;padding:15px;border-radius:12px;margin:5px 0;color:#31535d;font-weight:bold}
+.nav:hover{background:#eafaff;color:#1aa3cb}
+.nav.logout{color:#d95353}
+main{max-width:620px;margin:auto;padding:20px 15px 40px}
+.page{display:none}
+.page.active{display:block}
+.card{background:white;border:1px solid var(--border);border-radius:20px;padding:20px;margin-bottom:16px;box-shadow:0 8px 28px #387b8c10}
+.hero{background:linear-gradient(135deg,#8ce2f7,#40b9dd);padding:27px 22px;color:white;border-radius:23px;margin-bottom:16px}
+.hero h1{font-size:26px;margin-bottom:9px;overflow-wrap:anywhere}
+.hero p{font-size:13px;line-height:1.6}
+.title{font-size:19px;font-weight:900;margin-bottom:7px}
+.subtitle{font-size:12px;color:#758c93;line-height:1.6;margin-bottom:18px}
+.group{margin-bottom:14px}
+label{display:block;font-size:12px;font-weight:bold;margin-bottom:7px;color:#47646d}
+input{width:100%;height:48px;padding:0 13px;border:1px solid #d7e8ed;border-radius:12px;background:#fbfeff;outline:none}
+input:focus{border-color:var(--blue2);box-shadow:0 0 0 3px #73d5f222}
+.primary,.secondary,.danger{width:100%;min-height:49px;border-radius:13px;font-weight:900;margin-top:5px}
+.primary{background:linear-gradient(135deg,#73d5f2,#35b4da);color:white}
+.secondary{background:#ecfaff;color:#219fc6;border:1px solid #d6f0f7}
+.danger{background:#fff0f0;color:#d64f4f}
+.profile{display:flex;align-items:center;gap:13px}
+.avatar{height:55px;width:55px;border-radius:17px;background:linear-gradient(135deg,#83e1f7,#40b8dc);display:grid;place-items:center;color:white;font-size:23px;font-weight:bold;flex-shrink:0}
+.profile h2{font-size:18px;overflow-wrap:anywhere}
+.profile p{font-size:11px;color:#81959a;margin-top:5px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid #edf3f5;font-size:12px}
+.row:last-child{border:0}
+.row span:first-child{color:#7b9096}
+.row strong{text-align:right;overflow-wrap:anywhere}
+.payment-box{background:#f0fbfe;border:1px solid #d7f0f6;border-radius:16px;padding:15px;margin:12px 0}
+.amount{text-align:center;padding:10px}
+.amount small{display:block;color:#6b858d}
+.amount strong{display:block;font-size:29px;color:#25a6cc;margin-top:5px}
+.network{background:white;border:1px solid #dfedf1;border-radius:12px;padding:13px;margin:8px 0}
+.network strong{display:block;font-size:13px;margin-bottom:6px}
+.network p{font-size:12px;color:#637e86;line-height:1.65}
+.network .number{font-size:22px;font-weight:900;color:#20a5ce}
+.notice{padding:13px;background:#fff8e7;color:#785d20;border-radius:12px;font-size:11px;line-height:1.6;margin:12px 0}
+.badge{display:inline-block;padding:7px 10px;border-radius:20px;font-size:10px;font-weight:900}
+.pending{background:#fff3d7;color:#b77b0d}
+.verified{background:#e6f9ef;color:#128855}
+.muted{background:#edf2f4;color:#71848b}
+.toast{position:fixed;bottom:20px;left:15px;right:15px;z-index:120;background:#163d47;color:white;padding:15px;border-radius:13px;font-size:13px;opacity:0;transform:translateY(100px);transition:.25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.welcome{text-align:center;padding:20px 0}
+.biglogo{width:82px;height:82px;border-radius:26px;display:grid;place-items:center;margin:0 auto 15px;background:linear-gradient(135deg,#9be8fb,#42bce0);color:white;font-size:32px;font-weight:900}
+.welcome h1{color:#39b5d9;font-size:29px}
+.welcome h3{font-size:9px;letter-spacing:.6px;margin-top:6px;color:#728990}
+.welcome p{font-size:12px;color:#758c93;line-height:1.7;margin:15px 8px}
+.small{font-size:10px;color:#83969c;line-height:1.6}
+footer{text-align:center;font-size:9px;color:#8da1a7;padding:20px}
+
+/* Random popup notifications */
+#randomNotice{
+ position:fixed;top:82px;left:50%;
+ transform:translate(-50%,-18px);
+ width:calc(100% - 24px);max-width:430px;
+ background:#fff;color:#153c48;
+ border:1px solid #d7edf3;border-left:5px solid #39b6dc;
+ border-radius:15px;padding:13px 15px;
+ box-shadow:0 12px 35px #153c4830;
+ z-index:100;opacity:0;visibility:hidden;
+ transition:opacity .35s ease,transform .35s ease;
+ pointer-events:none;
+}
+#randomNotice.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
+#randomNotice.officer{border-left-color:#28a66a;background:#f3fff8}
+.notice-top{display:flex;align-items:center;gap:10px}
+.notice-avatar{width:39px;height:39px;flex-shrink:0;border-radius:50%;background:#e6f8fd;color:#219fc6;display:grid;place-items:center;font-weight:900;font-size:15px}
+#randomNotice.officer .notice-avatar{background:#dff8e9;color:#168650}
+.notice-body{min-width:0}
+.notice-heading{font-size:12px;font-weight:900;margin-bottom:5px}
+.notice-message{font-size:12px;line-height:1.5;color:#526d75;overflow-wrap:anywhere}
+.notice-label{font-size:9px;color:#83969c;margin-top:7px}
+.disclaimer{font-size:10px;line-height:1.7;color:#647b82;background:#f0f8fa;border-radius:10px;padding:12px;margin-top:12px}
+@media(min-width:650px){main{padding-top:30px}}
+@media(prefers-reduced-motion:reduce){#randomNotice{transition:none}}
+</style>
+</head>
+
+<body>
+<header>
+ <div class="brand">
+  <div class="logo">H</div>
+  <div>
+   <div class="brand-name">HEPA</div>
+   <div class="brand-long">HIGH EDUCATION PRIVATE ASSISTANCE</div>
+  </div>
+ </div>
+ <button class="menu-btn" onclick="openMenu()" aria-label="Open menu">☰</button>
+</header>
+
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+<aside class="sidebar" id="sidebar">
+ <button class="close" onclick="closeMenu()" aria-label="Close menu">×</button>
+ <div class="menu-title">
+  <strong>HESLB</strong>
+  <small>HIGH EDUCATION PRIVATE ASSISTANCE</small>
+ </div>
+ <button class="nav" onclick="go('home')">🏠 Home</button>
+ <button class="nav" onclick="go('dashboard')">📊 Dashboard</button>
+ <button class="nav" onclick="go('status')">📋 Application Status</button>
+ <button class="nav logout" onclick="logout()">🚪 Logout</button>
+</aside>
+
+<main>
+<section class="page" id="home">
+ <div class="welcome">
+  <div class="biglogo">H</div>
+  <h1>HESLB</h1>
+  <h3>HIGH EDUCATION PRIVATE ASSISTANCE</h3>
+  <p>Create your personal profile to begin your assistance application.</p>
+ </div>
+
+ <div class="card" id="createCard">
+  <div class="title">Create Account</div>
+  <div class="subtitle">Fill in your information.</div>
+  <form id="accountForm">
+   <div class="group">
+    <label for="fullName">Full Name</label>
+    <input id="fullName" required maxlength="100" autocomplete="name" placeholder="Enter full name">
+   </div>
+   <div class="group">
+    <label for="year">Year of Completion</label>
+    <input id="year" type="number" required min="1900" max="2100" placeholder="Example: 2024">
+   </div>
+   <div class="group">
+    <label for="index">Index Number</label>
+    <input id="index" required maxlength="60" placeholder="Enter index number">
+   </div>
+   <div class="group">
+    <label for="phone">Phone Number</label>
+    <input id="phone" type="tel" required maxlength="25" autocomplete="tel" placeholder="Enter phone number">
+   </div>
+   <button class="primary" type="submit">CREATE ACCOUNT</button>
+  </form>
+  <div class="disclaimer">
+   HEPA is a private assistance page and is not the official HESLB website.
+  </div>
+ </div>
+
+ <div class="card" id="existingCard" style="display:none">
+  <div class="profile">
+   <div class="avatar" id="existingAvatar">H</div>
+   <div><h2 id="existingName"></h2><p>Your profile is saved on this device.</p></div>
+  </div>
+  <br>
+  <button class="primary" onclick="go('dashboard')">OPEN DASHBOARD</button>
+ </div>
+</section>
+
+<section class="page" id="dashboard">
+ <div class="hero">
+  <h1 id="welcomeName">Welcome</h1>
+  <p>Your personal HEPA dashboard.</p>
+ </div>
+
+ <div class="card">
+  <div class="profile">
+   <div class="avatar" id="avatar">H</div>
+   <div><h2 id="dashName">Applicant</h2><p>HEPA Applicant Profile</p></div>
+  </div>
+ </div>
+
+ <div class="card">
+  <div class="title">Your Profile</div>
+  <div class="row"><span>Full Name</span><strong id="dashFullName"></strong></div>
+  <div class="row"><span>Completion Year</span><strong id="dashYear"></strong></div>
+  <div class="row"><span>Index Number</span><strong id="dashIndex"></strong></div>
+  <div class="row"><span>Phone Number</span><strong id="dashPhone"></strong></div>
+ </div>
+
+ <div class="card">
+  <div class="title">Assistance Application</div>
+  <div class="subtitle">Continue your application below.</div>
+  <div id="applicationSummary" style="display:none">
+   <div class="row"><span>Application Status</span><strong id="dashAppStatus"></strong></div>
+   <br>
+   <button class="secondary" onclick="go('status')">VIEW APPLICATION STATUS</button>
+  </div>
+  <button class="primary" id="getBtn" onclick="openApplication()">GET ASSISTANCE</button>
+ </div>
+</section>
+
+<section class="page" id="application">
+ <div class="card">
+  <div class="title">Assistance Application</div>
+  <div class="subtitle">Enter your education details and three names.</div>
+  <form id="applicationForm">
+   <div class="group">
+    <label for="appYear">Year of Completion</label>
+    <input id="appYear" type="number" min="1900" max="2100" required placeholder="Completion year">
+   </div>
+   <div class="group">
+    <label for="appIndex">Form 4 Index Number</label>
+    <input id="appIndex" required maxlength="60" placeholder="Form 4 index number">
+   </div>
+   <div class="group">
+    <label for="appNames">Three Names</label>
+    <input id="appNames" required maxlength="150" placeholder="First, middle and surname">
+   </div>
+   <button class="primary" type="submit">SUBMIT APPLICATION</button>
+  </form>
+ </div>
+</section>
+
+<section class="page" id="payment">
+ <div class="card">
+  <div class="title">💳 Assistance Payment</div>
+  <div class="subtitle">Review the payment details carefully before taking any action.</div>
+
+  <div class="payment-box">
+   <div class="amount">
+    <small>Amount displayed for payment</small>
+    <strong>TSh 25,000</strong>
+   </div>
+   <div class="network">
+    <strong>Payment Number</strong>
+    <span class="number" id="payNumber">356574572</span>
+   </div>
+   <div class="network">
+    <strong>Payment Name</strong>
+    <p style="font-size:16px;font-weight:900;color:#173c48">LIPA HASTAN-GLOBE</p>
+   </div>
+   <button class="secondary" onclick="copyPaymentNumber()">📋 COPY PAYMENT NUMBER</button>
+  </div>
+
+  <div class="notice">
+   <b>Please be careful:</b> This page does not independently verify the payment recipient or whether a fee is officially required. Confirm the recipient and purpose through an independent, trusted channel before sending money. Payment does not guarantee assistance.
+  </div>
+
+  <div class="title">📱 Mobile Money Information</div>
+  <div class="subtitle">USSD menus may change. Follow the instructions displayed by your network and verify the recipient before confirming.</div>
+
+  <div class="network">
+   <strong>1. M-Pesa — Vodacom</strong>
+   <p>Dial <b>*150*00#</b> and follow the available menu instructions.</p>
+  </div>
+  <div class="network">
+   <strong>2. Airtel Money</strong>
+   <p>Dial <b>*150*60#</b> and follow the available menu instructions.</p>
+  </div>
+  <div class="network">
+   <strong>3. Mixx by Yas</strong>
+   <p>Dial <b>*150*01#</b> and follow the available menu instructions.</p>
+  </div>
+  <div class="network">
+   <strong>4. HaloPesa</strong>
+   <p>Dial <b>*150*88#</b> and follow the available menu instructions.</p>
+  </div>
+  <div class="network">
+   <strong>5. Other networks</strong>
+   <p>Use your provider's official mobile-money menu and verify the recipient details before confirming.</p>
+  </div>
+
+  <button class="primary" onclick="go('submitPayment')">SUBMIT PAYMENT DETAILS</button>
+ </div>
+</section>
+
+<section class="page" id="submitPayment">
+ <div class="card">
+  <div class="title">Submit Payment Details</div>
+  <div class="subtitle">Enter the name used for payment and the transaction reference from your mobile-money message.</div>
+  <form id="paymentForm">
+   <div class="group">
+    <label for="paymentName">Payment Name</label>
+    <input id="paymentName" required maxlength="100" placeholder="Name used for payment">
+   </div>
+   <div class="group">
+    <label for="transaction">Transaction Number / Reference</label>
+    <input id="transaction" required maxlength="100" placeholder="Enter transaction reference">
+   </div>
+   <div class="notice">Submitting these details does not itself verify that money was received.</div>
+   <button class="primary" type="submit">SUBMIT PAYMENT</button>
+  </form>
+ </div>
+</section>
+
+<section class="page" id="status">
+ <div class="card">
+  <div class="title">Application Status</div>
+  <div class="subtitle">application saved successfully.</div>
+  <div id="statusContent"></div>
+ </div>
+</section>
+
+<footer>
+ HEPA · HIGH EDUCATION PRIVATE ASSISTANCE
+ <p style="margin-top:7px">High education loan.</p>
+</footer>
+</main>
+
+<!-- Random sample popup -->
+<div id="randomNotice" role="status" aria-live="polite">
+ <div class="notice-top">
+  <div class="notice-avatar" id="noticeAvatar">H</div>
+  <div class="notice-body">
+   <div class="notice-heading" id="noticeHeading">HEPA</div>
+   <div class="notice-message" id="noticeMessage"></div>
+   <div class="notice-label">UJUMBE</div>
+  </div>
+ </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+
+const KEY = "hepa_user_account_v2";
+const $ = id => document.getElementById(id);
+
+function getUser(){
+ try{
+  return JSON.parse(localStorage.getItem(KEY)) || null;
+ }catch(e){
+  return null;
+ }
+}
+
+function saveUser(user){
+ localStorage.setItem(KEY, JSON.stringify(user));
+}
+
+function notify(message){
+ const el = $("toast");
+ el.textContent = message;
+ el.classList.add("show");
+ clearTimeout(window.hepaToastTimer);
+ window.hepaToastTimer = setTimeout(() => el.classList.remove("show"), 3200);
+}
+
+function openMenu(){
+ $("sidebar").classList.add("open");
+ $("overlay").classList.add("show");
+}
+
+function closeMenu(){
+ $("sidebar").classList.remove("open");
+ $("overlay").classList.remove("show");
+}
+
+function go(page){
+ const user = getUser();
+ const allowed = ["home","dashboard","application","payment","submitPayment","status"];
+
+ if(!allowed.includes(page)) page = "home";
+ if(!user && page !== "home") page = "home";
+
+ document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+ $(page).classList.add("active");
+ closeMenu();
+ window.scrollTo({top:0, behavior:"smooth"});
+
+ if(page === "dashboard") updateDashboard();
+ if(page === "status") updateStatus();
+}
+
+function escapeHTML(value){
+ return String(value ?? "").replace(/[&<>"']/g, c => ({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+$("accountForm").addEventListener("submit", e => {
+ e.preventDefault();
+
+ if(getUser()){
+  notify("An account already exists in this browser.");
+  return;
+ }
+
+ const user = {
+  fullName:$("fullName").value.trim(),
+  year:$("year").value.trim(),
+  index:$("index").value.trim(),
+  phone:$("phone").value.trim(),
+  createdAt:Date.now(),
+  application:null,
+  payment:null
+ };
+
+ if(!user.fullName || !user.year || !user.index || !user.phone){
+  notify("Please complete every field.");
+  return;
+ }
+
+ saveUser(user);
+ notify("Account created successfully.");
+ updateAll();
+ setTimeout(() => go("dashboard"), 500);
+});
+
+function updateDashboard(){
+ const u = getUser();
+ if(!u) return;
+
+ $("welcomeName").textContent = "Welcome, " + u.fullName.split(/\s+/)[0];
+ $("dashName").textContent = u.fullName;
+ $("dashFullName").textContent = u.fullName;
+ $("dashYear").textContent = u.year;
+ $("dashIndex").textContent = u.index;
+ $("dashPhone").textContent = u.phone;
+ $("avatar").textContent = u.fullName.charAt(0).toUpperCase();
+
+ $("getBtn").style.display = u.application ? "none" : "block";
+ $("applicationSummary").style.display = u.application ? "block" : "none";
+
+ if(u.application){
+  let statusText = "SUBMITTED";
+  let badgeClass = "verified";
+
+  if(u.payment){
+   statusText = "PAYMENT PENDING";
+   badgeClass = "pending";
+  }
+
+  $("dashAppStatus").innerHTML =
+   '<span class="badge ' + badgeClass + '">' + statusText + '</span>';
+ }
+}
+
+function openApplication(){
+ const u = getUser();
+ if(!u) return go("home");
+
+ if(u.application){
+  notify("Your application has already been submitted.");
+  return;
+ }
+
+ $("appYear").value = u.year;
+ $("appIndex").value = u.index;
+ $("appNames").value = u.fullName;
+ go("application");
+}
+
+$("applicationForm").addEventListener("submit", e => {
+ e.preventDefault();
+
+ const u = getUser();
+ if(!u) return;
+
+ if(u.application){
+  notify("Application already submitted.");
+  return;
+ }
+
+ u.application = {
+  year:$("appYear").value.trim(),
+  index:$("appIndex").value.trim(),
+  names:$("appNames").value.trim(),
+  submittedAt:Date.now()
+ };
+
+ saveUser(u);
+ updateAll();
+ notify("Application submitted successfully.");
+ setTimeout(() => go("payment"), 500);
+});
+
+async function copyPaymentNumber(){
+ const number = "356574572";
+
+ try{
+  if(navigator.clipboard && navigator.clipboard.writeText){
+   await navigator.clipboard.writeText(number);
+   notify("Payment number copied.");
+  }else{
+   throw new Error("Clipboard unavailable");
+  }
+ }catch(e){
+  notify("Please copy the number manually: " + number);
+ }
+}
+
+$("paymentForm").addEventListener("submit", e => {
+ e.preventDefault();
+
+ const u = getUser();
+ if(!u || !u.application){
+  notify("Submit an application first.");
+  return;
+ }
+
+ if(u.payment){
+  notify("Payment details have already been submitted.");
+  return;
+ }
+
+ u.payment = {
+  name:$("paymentName").value.trim(),
+  transaction:$("transaction").value.trim(),
+  submittedAt:Date.now(),
+  status:"PENDING"
+ };
+
+ saveUser(u);
+ updateAll();
+ notify("Details saved locally. Status: PENDING.");
+ setTimeout(() => go("status"), 500);
+});
+
+function updateStatus(){
+ const u = getUser();
+ const box = $("statusContent");
+
+ if(!u){
+  box.innerHTML = '<p class="small">Create an account to view your application.</p>';
+  return;
+ }
+
+ if(!u.application){
+  box.innerHTML =
+   '<p class="small">No application submitted yet.</p><br>' +
+   '<button class="primary" onclick="go(\'dashboard\')">GO TO DASHBOARD</button>';
+  return;
+ }
+
+ let html = `
+  <div class="row"><span>Applicant</span><strong>${escapeHTML(u.fullName)}</strong></div>
+  <div class="row"><span>Application</span><strong><span class="badge verified">SUBMITTED</span></strong></div>
+  <div class="row"><span>Completion Year</span><strong>${escapeHTML(u.application.year)}</strong></div>
+  <div class="row"><span>Form 4 Index</span><strong>${escapeHTML(u.application.index)}</strong></div>`;
+
+ if(!u.payment){
+  html += `
+   <br>
+   <p class="notice">Your application information is saved on this device. Check the legitimacy and terms of any fee before paying.</p>
+   <button class="primary" onclick="go('payment')">VIEW PAYMENT INFORMATION</button>`;
+ }else{
+  html += `
+   <div class="row"><span>Payment Status</span><strong><span class="badge pending">PENDING</span></strong></div>
+   <div class="row"><span>Transaction Reference</span><strong>${escapeHTML(u.payment.transaction)}</strong></div>
+   <p class="notice">The reference is saved successfully.waiting for confirmation and visit everytime to view the status.</p>`;
+ }
+
+ box.innerHTML = html;
+}
+
+function updateAll(){
+ updateDashboard();
+ updateStatus();
+}
+
+function logout(){
+ if(!confirm("Remove the saved account from this browser? This cannot be undone.")) return;
+ localStorage.removeItem(KEY);
+ closeMenu();
+ location.reload();
+}
+
+function start(){
+ const u = getUser();
+
+ if(!u){
+  $("createCard").style.display = "block";
+  $("existingCard").style.display = "none";
+  go("home");
+  return;
+ }
+
+ $("createCard").style.display = "none";
+ $("existingCard").style.display = "block";
+ $("existingName").textContent = u.fullName;
+ $("existingAvatar").textContent = u.fullName.charAt(0).toUpperCase();
+
+ updateAll();
+ go("dashboard");
+}
+
+/* ---------------------------------
+    NOTIFICATIONS
+   These are testimonial notifications.
+---------------------------------- */
+
+const sampleNames = [
+ "Said","Musa","John","Michael","Mwita","Jermia",
+ "Enock","Baraka","Chande","Maishe","Majura",
+ "Emmanueli","Bundala Matiku","Zakaria","Jenipha",
+ "Lightness","Johari","Adam","Hamad","Kingu",
+ "Bahati","Elieth","Monica"
+];
+
+const sampleMessages = [
+ "Nashukuru sana, loan officer umenisaidia 🙏",
+ "Sikutarajia, nashukuru sana!",
+ "Mungu akubariki sana kwa kututia moyo 🙏",
+ "Unatusaidia vijana wako, tunashukuru sana.",
+ "Maisha ya chuo bila mkopo yana changamoto nyingi. Asante kwa kututia moyo.",
+ "Nashukuru sana kwa maelekezo na moyo wa kutusaidia 🎉",
+ "Tutashirikiana siku zote, officer 🙏",
+ "Asante sana kwa kutupa moyo katika safari yetu ya masomo.",
+ "Nina matumaini ya kufanikiwa kwenye masomo yangu. Asante sana."
+];
+
+const officerMessages = [
+ "LOAN OFFICER.... TUTAZIDI KUWA PAMOJA, NYIE NI KAMA WATOTO WANGU 🙏",
+ "LOAN OFFICER.... NAPENDA KUWAMBIA MSIJALI, MTAFANIKIWA WOTE 🙏",
+ "LOAN OFFICER.... NIWATAKIE MAFANIKIO MEMA MASOMONI KWENU 🙏",
+ "LOAN OFFICER.... SIKU ZIMEBAKI CHACHE SANA 🙏"
+];
+
+let previousNameIndex = -1;
+let previousOfficerIndex = -1;
+let normalMessagesSinceOfficer = 0;
+let noticeTimer = null;
+let noticeInterval = null;
+let firstNoticeTimer = null;
+
+function randomDifferentIndex(length, previous){
+ if(length <= 1) return 0;
+
+ let index;
+ do{
+  index = Math.floor(Math.random() * length);
+ }while(index === previous);
+
+ return index;
+}
+
+function showRandomNotice(isOfficer){
+ const popup = $("randomNotice");
+ const avatar = $("noticeAvatar");
+ const heading = $("noticeHeading");
+ const message = $("noticeMessage");
+
+ if(!popup || !avatar || !heading || !message) return;
+
+ popup.classList.remove("show","officer");
+
+ let name;
+ let text;
+
+ if(isOfficer){
+  previousOfficerIndex = randomDifferentIndex(
+   officerMessages.length,
+   previousOfficerIndex
+  );
+
+  name = "LOAN OFFICER";
+  text = officerMessages[previousOfficerIndex];
+  popup.classList.add("officer");
+  avatar.textContent = "LO";
+ }else{
+  previousNameIndex = randomDifferentIndex(
+   sampleNames.length,
+   previousNameIndex
+  );
+
+  name = sampleNames[previousNameIndex];
+  text = sampleMessages[Math.floor(Math.random() * sampleMessages.length)];
+  avatar.textContent = name.charAt(0).toUpperCase();
+ }
+
+ heading.textContent = name;
+ message.textContent = text;
+
+ // Restart the animation cleanly.
+ requestAnimationFrame(() => popup.classList.add("show"));
+
+ clearTimeout(noticeTimer);
+ noticeTimer = setTimeout(() => {
+  popup.classList.remove("show");
+ }, 5000);
+}
+
+function startRandomNotices(){
+ if(noticeInterval || firstNoticeTimer) return;
+
+ // First popup appears after 2.5 seconds.
+ firstNoticeTimer = setTimeout(() => {
+  firstNoticeTimer = null;
+  showRandomNotice(false);
+  normalMessagesSinceOfficer = 1;
+
+  // Show a new popup every 8 seconds.
+  noticeInterval = setInterval(() => {
+   if(normalMessagesSinceOfficer >= 2){
+    showRandomNotice(true);
+    normalMessagesSinceOfficer = 0;
+   }else{
+    showRandomNotice(false);
+    normalMessagesSinceOfficer++;
+   }
+  }, 8000);
+ }, 2500);
+}
+
+start();
+startRandomNotices();
+</script>
+</body>
+</html>
